@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import shajs from 'sha.js'
+import crypto from 'crypto'
 
 export default class App extends Component {
   constructor(props) {
@@ -17,7 +17,7 @@ export default class App extends Component {
   componentDidUpdate() {
     const option = this.state.option
     const input = this.state.input
-    const hash = shajs(option).update(input).digest('hex')
+    const hash = crypto.createHash(option).update(input).digest('hex')
     if (this.state.hash !== hash) {
       this.setState(() => ({ hash }))
     }    
@@ -52,7 +52,7 @@ export default class App extends Component {
 
 App.defaultProps = {
   input: '',
-  options: ['sha', 'sha1', 'sha256'],
+  options: ['sha', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512', 'md5'],
   option: 'sha'
 }
 
