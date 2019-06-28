@@ -1,138 +1,147 @@
-import React from 'react'
+import React, { Component } from 'react'
 import shajs from 'sha.js'
 
-class App extends React.Component {
+export default class App extends Component {
   constructor(props) {
     super(props)
+    this.handleInputChange = this.handleInputChange.bind(this)
+    this.handleChangeOption = this.handleChangeOption.bind(this)
     this.state = {
-      options: 'sha',
-      input: 'adf',
-      output: ''
+      input: props.input,
+      options: props.options,
+      option: props.option,
+      hash: undefined
     }
-    console.log(this.state.option)
   }
 
-  render() {
-    const title = 'Hash It'
-    return (
-      <div className="App">
-        <Header title={ title } />
-        <Input input={ this.state.input } />
-      </div>
-    )
+  componentDidUpdate() {
+    const option = this.state.option
+    const input = this.state.input
+    const hash = shajs(option).update(input).digest('hex')
+    if (this.state.hash !== hash) {
+      this.setState(() => ({ hash }))
+    }    
   }
-}
 
-class Header extends React.Component {
+  handleInputChange(input) {
+    this.setState(() => ({ input }))
+  }
+
+  handleChangeOption(option) {
+    this.setState(() => ({ option }))
+  }
+
   render() {
     return (
       <div>
-        <h1>{ this.props.title }</h1>
+        <Header />
+        <Input
+          handleInputChange={ this.handleInputChange }
+        />
+        <Output
+          hash={ this.state.hash }
+        />
+        <Options
+          options={ this.state.options }
+          handleChangeOption={ this.handleChangeOption }
+        />
       </div>
     )
   }
 }
 
-class Input extends React.Component {
+App.defaultProps = {
+  input: '',
+  options: ['sha', 'sha1', 'sha256'],
+  option: 'sha'
+}
+
+const Header = props => (
+  <div>
+    <h1>{ props.title }</h1>
+  </div>
+)
+
+Header.defaultProps = {
+  title: 'Hash It'
+}
+
+class Input extends Component {
   constructor(props) {
     super(props)
-    // this.handleInputChange = this.handleInputChange.bind(this)
-    this.generateHash = this.generateHash.bind(this)
-    this.handleOptionChange = this.handleOptionChange.bind(this)
-    this.state = { input: '', ouptut: '', option: 'sha' }
+    this.handleInputChange = this.handleInputChange.bind(this)
+    this.state = {
+      input: undefined
+    }
   }
 
-  // handleInputChange(event) {
-  //   const input = event.target.value
+  handleInputChange(event) {
+    event.preventDefault()
 
-  //   this.setState(() => {
-  //     return { input: input }
-  //   })
-  // }
-  handleOptionChange(event) {
-    const option = event.target.value
-console.log(option)
-    this.setState(prev => {
-      return { option: option }
-    })
-  }
+    const input = event.target.elements.input.value
 
-  generateHash(event) {
-    const input = event.target.value
-console.log(input)
-    this.setState(() => {
-      return {
-        input: input,
-        ouptut: shajs(this.state.option).update(input).digest('hex')
-      }
-    })
+    this.props.handleInputChange(input)
+    this.setState(() => ({ input }))
   }
 
   render() {
     return (
       <div>
-        <input
-          type="text"
-          name="input"
-          onChange={ this.generateHash }
-        />
-        <p>
-          {
-            this.state.ouptut
-          }
-        </p>
-        <form>
-          <label htmlFor="sha">SHA</label>
-          <input type="radio" name="option" value="sha" id="sha" checked={ this.state.option === 'sha' } onChange={ this.handleOptionChange } />
-          <label htmlFor="sha1">SHA1</label>
-          <input type="radio" name="option" value="sha1" id="sha1" checked={ this.state.option === 'sha1' } onChange={ this.handleOptionChange } />
-          <label htmlFor="sha256">SHA256</label>
-          <input type="radio" name="option" value="sha256" id="sha256" checked={ this.state.option === 'sha256' } onChange={ this.handleOptionChange } />
+        <form onSubmit={ this.handleInputChange }>
+          <input type="text" name="input" />
+          <button>Hash It</button>
         </form>
       </div>
     )
   }
 }
 
-class Output extends React.Component {
+const Output = props => (
+  <div>
+    <p>{ props.hash }</p>
+  </div>
+)
+
+const Options = props => (
+  <div>
+    {
+      props.options.map((option, i) => (
+        <Option
+          key={ i }
+          optionText={ option }
+          handleChangeOption={ props.handleChangeOption }
+        />
+      ))
+    }
+  </div>
+)
+
+class Option extends Component {
+  constructor(props) {
+    super(props)
+    this.handleChangeOption = this.handleChangeOption.bind(this)
+    this.state = {
+      option: this.props.optionText
+    }
+  }
+
+  handleChangeOption(event) {
+    const option = event.target.value
+
+    this.props.handleChangeOption(option)
+    this.setState(() => ({ option }))
+  }
+
   render() {
     return (
-      <input
-        type="text"
-        value={ this.props.output }
-        onClick={ this.props.generateHash }
-      />
+      <div>
+        <button
+          value={ this.props.optionText }
+          onClick={ this.handleChangeOption }
+        >
+          { this.props.optionText }
+        </button>
+      </div>
     )
   }
 }
-
-// class Options extends React.Component {
-//   constructor(props) {
-//     super(props)
-//     this.handleOptionChange = this.handleOptionChange.bind(this)
-//     this.state = { option: 'sha' }
-//   }
-
-//   handleOptionChange(event) {
-//     const option = event.target.value
-
-//     this.setState(prev => {
-//       return { option: option }
-//     })
-//   }
-
-//   render() {
-//     return (
-//       <form>
-//         <label htmlFor="sha">SHA</label>
-//         <input type="radio" name="option" value="sha" id="sha" checked={ this.state.option === 'sha' } onChange={ this.handleOptionChange } />
-//         <label htmlFor="sha1">SHA1</label>
-//         <input type="radio" name="option" value="sha1" id="sha1" checked={ this.state.option === 'sha1' } onChange={ this.handleOptionChange } />
-//         <label htmlFor="sha256">SHA256</label>
-//         <input type="radio" name="option" value="sha256" id="sha256" checked={ this.state.option === 'sha256' } onChange={ this.handleOptionChange } />
-//       </form>
-//     )
-//   }
-// }
-
-export default App;
