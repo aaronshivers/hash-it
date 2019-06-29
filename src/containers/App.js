@@ -1,5 +1,11 @@
 import React, { Component } from 'react'
 import crypto from 'crypto'
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+import Form from 'react-bootstrap/Form'
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
+import Button from 'react-bootstrap/Button'
 
 export default class App extends Component {
   constructor(props) {
@@ -33,19 +39,19 @@ export default class App extends Component {
 
   render() {
     return (
-      <div>
+      <Container>
         <Header />
         <Input
           handleInputChange={ this.handleInputChange }
-        />
-        <Output
-          hash={ this.state.hash }
         />
         <Options
           options={ this.state.options }
           handleChangeOption={ this.handleChangeOption }
         />
-      </div>
+        <Output
+          hash={ this.state.hash }
+        />
+      </Container>
     )
   }
 }
@@ -57,9 +63,7 @@ App.defaultProps = {
 }
 
 const Header = props => (
-  <div>
-    <h1>{ props.title }</h1>
-  </div>
+    <h1 className="display-2 text-center">{ props.title }</h1>
 )
 
 Header.defaultProps = {
@@ -86,34 +90,42 @@ class Input extends Component {
 
   render() {
     return (
-      <div>
-        <form onSubmit={ this.handleInputChange }>
-          <input type="text" name="input" />
-          <button>Hash It</button>
-        </form>
-      </div>
+      <Form onSubmit={ this.handleInputChange }>
+        <Form.Group>
+          <Form.Label>Input</Form.Label>
+          <Form.Control
+            type="text"
+            name="input"
+            placeholder="Enter something you want hashed"
+          />
+        </Form.Group>
+      </Form>
     )
   }
 }
 
 const Output = props => (
-  <div>
-    <p>{ props.hash }</p>
-  </div>
+  <Row className="mt-3">
+    <Col>
+      <p className="text-center text-break">{ props.hash }</p>
+    </Col>
+  </Row>
 )
 
 const Options = props => (
-  <div>
-    {
-      props.options.map((option, i) => (
-        <Option
-          key={ i }
-          optionText={ option }
-          handleChangeOption={ props.handleChangeOption }
-        />
-      ))
-    }
-  </div>
+  <Row className="justify-content-center">
+    <ButtonGroup>
+      {
+        props.options.map((option, i) => (
+          <Option
+            key={ i }
+            optionText={ option }
+            handleChangeOption={ props.handleChangeOption }
+          />
+        ))
+      }
+    </ButtonGroup>
+  </Row>
 )
 
 class Option extends Component {
@@ -134,14 +146,12 @@ class Option extends Component {
 
   render() {
     return (
-      <div>
-        <button
-          value={ this.props.optionText }
-          onClick={ this.handleChangeOption }
-        >
-          { this.props.optionText }
-        </button>
-      </div>
+      <Button
+        value={ this.props.optionText }
+        onClick={ this.handleChangeOption }
+      >
+        { this.props.optionText }
+      </Button>
     )
   }
 }
