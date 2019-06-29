@@ -1,7 +1,5 @@
 import React from 'react'
 
-export default () => (
-  <div className="App-header">
-    <h1>Hash It</h1>
-  </div>
+export default props => (
+  <h1 className="display-2 text-center mt-3">{ props.title }</h1>
 )
